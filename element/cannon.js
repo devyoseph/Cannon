@@ -13,10 +13,14 @@ export class Cannon{
         //this.a =  function(energy.accelerate) 속도와 가속도 얻어냄
         //this.vx += this.a == 대포가 가진 힘과 공의 무게를 분리한다
     }
-    draw(ctx, image, stageWidth, stageHeight){
+    draw(ctx, image, stageWidth, stageHeight, angle){
       //  ctx.fillStyle = 'black';
      //   ctx.fillRect(this.x,this.y,this.cannon_width,this.cannon_height);
         ctx.drawImage(image,this.x,this.y);
+        //가이드선
+        ctx.fillStyle = 'red';
+        ctx.fillRect(this.x, this.y, 10, 10);
+        ctx.fillRect(this.x+100*Math.cos(angle),this.y-100*Math.sin(angle), 10, 10);
     }
 
 
