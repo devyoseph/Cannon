@@ -1,4 +1,5 @@
 import{Ball}from './element/ball.js';
+import { Brick } from './element/brick.js';
 import{Cannon}from './element/cannon.js';
 import{Stage}from './element/stage.js';
 //import {Engine} from './element/engine.js';
@@ -16,10 +17,13 @@ var fire_ball = false;
 var ball_speed = 50;
 //var ball_mass = 10;
 var ball_angle = PI/4;
-//stage의 walls
-let walls = [];
-let wallsHeight_X = [];
-let wallsHeight_Y = [];
+//stage의 벽돌 배치 walls
+var walls = []; //로드용
+//벽돌
+var bricks = [];
+//게임이 진행중인가, 벽이 부서졌는가
+let onGame =false;
+let brick_touch = false;
 class App{
     constructor(){
         this.canvas = document.createElement('canvas');
@@ -33,9 +37,19 @@ class App{
         //스테이지 로드
         this.stage = new Stage(1, this.stageWidth, this.stageHeight);
         this.walls = this.stage.walls;
-        this.wallsHeight_X = this.stage.walls_hor_X;
-        this.wallsHeight_Y = this.stage.walls_hor_Y;
-        console.log(this.wallsHeight_X);
+        this.walls_hor_X = this.stage.walls_hor_X;
+        this.walls_hor_Y = this.stage.walls_hor_Y;
+        //벽
+        if(onGame === false){
+            for(let i = 0; i < this.walls.length; i++){
+                for(let j = 0; j < this.walls[i].length; j++){
+                    var brick = new Brick(this.walls[i][j],this.walls_hor_X[i][j],this.walls_hor_Y[i][j],
+                                this.stageWidth,this.stageHeight, balls, brick_touch);
+                    bricks.push(brick);
+                }
+            }   
+            onGame = true;}
+
 
         //대포 관련
         this.cannon = new Cannon(this.stageWidth, this.stageHeight);
@@ -43,7 +57,6 @@ class App{
         document.addEventListener('keydown', this.cannonAiming.bind(this), false);
         //공 관련
         document.addEventListener('keydown', this.fire.bind(this), false);
-       
         window.requestAnimationFrame(this.animate.bind(this));
     }
     
@@ -59,25 +72,38 @@ class App{
     animate(t){
         window.requestAnimationFrame(this.animate.bind(this));
         this.ctx.clearRect(0,0,this.stageWidth,this.stageHeight);
-        //스테이지
-        //this.stage.draw(this.ctx, walls,this.stageWidth, this.stageHeight);
-        
         //대포
         this.cannon.draw(this.ctx, this.stageWidth,this.stageHeight, ball_angle);
+        //스테이지
+        bricks.forEach((brick_each,i , o)=>{
+            brick_each.draw(this.ctx, balls, brick_touch)
+            if(brick_each.type == 0){
+                o.splice(i,1);
+            }
+        })
         //공을 발사
         if(fire_ball == true){
             //if함수 내부에서 볼을 정의하고 보낸다, 외부에서 정의한 걸 불러오면 오류
             var ball =  new Ball(1, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed);
             balls.push(ball);
             fire_ball = false;
-        }
-        
+        } 
         balls.forEach((ball_each, i, o) =>{
             ball_each.draw(this.ctx, this.stageWidth, this.stageHeight);
             if(ball_each.speed < 0.2){
                 o.splice(i,1);
             }
+            if(brick_touch === true){
+                for(let i = 0; i < this.walls.length; i++){
+                    for(let j = 0; j < this.walls[i].length; j++){
+                        var brick = new Brick(this.walls[i][j],this.walls_hor_X[i][j],this.walls_hor_Y[i][j],
+                                    this.stageWidth,this.stageHeight, balls);
+                        bricks.push(brick);
+                    }
+                }   
+                brick_touch = false;}
         })
+
     }
 
     cannonMove(e){
@@ -98,9 +124,6 @@ class App{
         }
     }
 
-
-
-
     fire(e){
         if(e.code === 'Space'){
             fire_ball = true;
@@ -108,7 +131,11 @@ class App{
 
     }
 
-}
+
+
+
+    }
+
 
 window.onload = () =>{
     new App();

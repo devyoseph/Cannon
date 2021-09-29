@@ -76,4 +76,10 @@ export class Ball{
         }
     }
 
+    bounceBrick(brick){
+        if(this.y-this.radius >= brick.y){
+            this.y *= -1;
+        }
+    }
+
 }

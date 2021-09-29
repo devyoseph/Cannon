@@ -2,11 +2,11 @@ let img_cannon = new Image();
         img_cannon.src = 'image/cannon.png';
 export class Cannon{
     constructor(stageWidth, stageHeight){
-        this.cannon_width = 50;
-        this.cannon_height = 20;
-        this.wheel_height = 10;
+        this.cannon_width = stageWidth/50;
+        this.cannon_height = stageHeight/20;
+        this.wheel_height = stageHeight/40;
         this.x = this.cannon_width;
-        this.y = stageHeight - (this.cannon_height + this.wheel_height + 50);
+        this.y = stageHeight - (this.cannon_height + this.wheel_height + stageHeight/20);
 
         
         //+ ground
