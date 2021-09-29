@@ -1,11 +1,12 @@
 import{Ball}from './element/ball.js';
 import{Cannon}from './element/cannon.js';
+import{Stage}from './element/stage.js';
 //import {Engine} from './element/engine.js';
 //각도 사용을 위한 PI 변수화
 const PI = Math.PI;
 //대포의 이미지 로드
-var img_cannon = new Image();
-img_cannon.src = 'image/cannon.png';
+// let img_cannon = new Image();
+// img_cannon.src = 'image/cannon.png';
 //대포 출력
 var cannon_power = 600;
 //공 배열과 공 발사 변수
@@ -15,7 +16,10 @@ var fire_ball = false;
 var ball_speed = 50;
 //var ball_mass = 10;
 var ball_angle = PI/4;
-
+//stage의 walls
+let walls = [];
+let wallsHeight_X = [];
+let wallsHeight_Y = [];
 class App{
     constructor(){
         this.canvas = document.createElement('canvas');
@@ -26,14 +30,19 @@ class App{
         window.addEventListener('resize', this.resize.bind(this), false);
         this.resize(); //리사이즈가 이벤트를 거치지 않아도 발동하기 위함
         
+        //스테이지 로드
+        this.stage = new Stage(1, this.stageWidth, this.stageHeight);
+        this.walls = this.stage.walls;
+        this.wallsHeight_X = this.stage.walls_hor_X;
+        this.wallsHeight_Y = this.stage.walls_hor_Y;
+        console.log(this.wallsHeight_X);
+
         //대포 관련
         this.cannon = new Cannon(this.stageWidth, this.stageHeight);
         document.addEventListener('keydown', this.cannonMove.bind(this), false);
         document.addEventListener('keydown', this.cannonAiming.bind(this), false);
         //공 관련
         document.addEventListener('keydown', this.fire.bind(this), false);
-        //공의 엔진
-        //this.engine = new Engine(cannon_power, ball_mass, this.cannon.wheel_height, ball_speed)
        
         window.requestAnimationFrame(this.animate.bind(this));
     }
@@ -50,9 +59,12 @@ class App{
     animate(t){
         window.requestAnimationFrame(this.animate.bind(this));
         this.ctx.clearRect(0,0,this.stageWidth,this.stageHeight);
+        //스테이지
+        //this.stage.draw(this.ctx, walls,this.stageWidth, this.stageHeight);
         
-        this.cannon.draw(this.ctx, img_cannon,this.stageWidth,this.stageHeight, ball_angle);
-//공을 발사
+        //대포
+        this.cannon.draw(this.ctx, this.stageWidth,this.stageHeight, ball_angle);
+        //공을 발사
         if(fire_ball == true){
             //if함수 내부에서 볼을 정의하고 보낸다, 외부에서 정의한 걸 불러오면 오류
             var ball =  new Ball(1, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed);
@@ -65,8 +77,6 @@ class App{
             if(ball_each.speed < 0.2){
                 o.splice(i,1);
             }
-            
-            console.log(ball_each.speed);
         })
     }
 
