@@ -97,7 +97,7 @@ class App{
         } 
         balls.forEach((ball_each, i, o) =>{
             ball_each.draw(this.ctx, this.stageWidth, this.stageHeight);
-            if(ball_each.speed < 0.2){
+            if(ball_each.speed < 0.2 || ball_each.ball_meet == true){
                 o.splice(i,1);}
         })
 

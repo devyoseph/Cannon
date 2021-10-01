@@ -4,7 +4,9 @@ export class Ball{
         this.g = 9.81;
         this.angle = angle;
         this.type = type;
-        this.magnitude = magnitude; 
+        this.magnitude = magnitude;
+        //다른 속성끼리 부딪힐 때 사용
+        this.ball_meet = false; 
         if(this.magnitude == 1){
             this.force = 300;
             this.mass = 10;
@@ -32,9 +34,8 @@ export class Ball{
             this.aY = this.force*Math.cos(this.angle)/this.mass;}
         
 
-        this.x = cannonX;     //this.radius + (Math.random() * (stageWidth - diameter));
-        this.y = cannonY;    //this.radius + (Math.random() * (stageHeight - diameter));
-        //아래 계산의 높이 초기값을 0으로 맞춰준다 valueY-80
+        this.x = cannonX;     
+        this.y = cannonY;    
         this.speed = speed;
         this.vx = this.speed * Math.cos(angle);
         this.vy = -this.speed * Math.sin(angle);
