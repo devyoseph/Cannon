@@ -13,10 +13,11 @@ var cannon_power = 600;
 //공 배열과 공 발사 변수
 var balls = [];
 var fire_ball = false;
-//공의 무게와 속도
+//공의 타입과 속도
+var ball_type = 1;
 var ball_speed = 50;
-//var ball_mass = 10;
 var ball_angle = PI/4;
+var ball_magnitude = 1;
 //stage의 벽돌 배치 walls
 var walls = []; //로드용
 //벽돌
@@ -58,6 +59,7 @@ class App{
         //공 관련
         document.addEventListener('keydown', this.fire.bind(this), false);
         window.requestAnimationFrame(this.animate.bind(this));
+        document.addEventListener('keydown', this.shiftBall.bind(this));
     }
     
     resize(){
@@ -84,24 +86,19 @@ class App{
         //공을 발사
         if(fire_ball == true){
             //if함수 내부에서 볼을 정의하고 보낸다, 외부에서 정의한 걸 불러오면 오류
-            var ball =  new Ball(1, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed);
+            switch(ball_type){
+                case 1: var ball =  new Ball(1, ball_magnitude, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed); break;
+                case 2: var ball =  new Ball(2, ball_magnitude, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed); break;
+                case 3: var ball =  new Ball(3, ball_magnitude, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed); break;
+            }
+            // var ball =  new Ball(1, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed);
             balls.push(ball);
             fire_ball = false;
         } 
         balls.forEach((ball_each, i, o) =>{
             ball_each.draw(this.ctx, this.stageWidth, this.stageHeight);
             if(ball_each.speed < 0.2){
-                o.splice(i,1);
-            }
-            if(brick_touch === true){
-                for(let i = 0; i < this.walls.length; i++){
-                    for(let j = 0; j < this.walls[i].length; j++){
-                        var brick = new Brick(this.walls[i][j],this.walls_hor_X[i][j],this.walls_hor_Y[i][j],
-                                    this.stageWidth,this.stageHeight, balls);
-                        bricks.push(brick);
-                    }
-                }   
-                brick_touch = false;}
+                o.splice(i,1);}
         })
 
     }
@@ -131,6 +128,17 @@ class App{
 
     }
 
+    shiftBall(e){
+
+        if(e.key === 'Shift'){
+        
+            switch(ball_type){
+                case 1: ball_type++; break;
+                case 2: ball_type++; break;
+                case 3: ball_type = 1; break;
+            }
+        }
+    }
 
 
 

@@ -1,19 +1,21 @@
 export class Ball{
-    constructor(type ,cannonX, cannonY, angle, stageWidth, stageHeight, speed){
+    constructor(type, magnitude,cannonX, cannonY, angle, stageWidth, stageHeight, speed){
         //공의 타입에 따라 세기가 달라진다
         this.g = 9.81;
         this.angle = angle;
-        if(type == 1){
+        this.type = type;
+        this.magnitude = magnitude; 
+        if(this.magnitude == 1){
             this.force = 300;
             this.mass = 10;
             this.radius = 10;
         }
-        if(type == 2){
+        else if(this.magnitude == 2){
             this.force = 300;
             this.mass = 22.5;
             this.radius = 15;
         }
-        if(type == 3){
+        else if(this.magnitude == 3){
             this.force = 300;
             this.mass = 40;
             this.radius = 20;
@@ -46,7 +48,13 @@ export class Ball{
         //포탄을 배열에서 회수하기위한 스피드 변수 측정
         this.speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
         this.bounceWindow(stageWidth,stageHeight);
+        if(this.type == 1){
         ctx.fillStyle = 'blue';
+        }else if(this.type == 2){
+        ctx.fillStyle = 'green';    
+        }else if(this.type == 3){
+        ctx.fillStyle = 'red';
+        }
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
         ctx.fill();
