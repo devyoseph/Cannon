@@ -1,28 +1,29 @@
 export class Ball{
-    constructor(type, magnitude,cannonX, cannonY, angle){
+    constructor(type, magnitude, gauge_transfer,cannonX, cannonY, angle){
         //공의 타입에 따라 세기가 달라진다
         this.g = 9.81;
         this.magnitude = magnitude;
+        this.gauge_transfer = gauge_transfer;
         this.angle = angle;
         //brick과 부딪힐 때 사용
         this.ball_meet = false;
 
         switch(type){
-            case 1: this.type = 1; console.log(this.type); break;
-            case 2: this.type = 2; console.log(this.type);break;
-            case 3: this.type = 3; console.log(this.type);break;
+            case 1: this.type = 1; break;
+            case 2: this.type = 2; break;
+            case 3: this.type = 3; break;
         }
         switch(this.magnitude){
             case 1:  this.mass = 10;
                      this.radius = 20;
-                     this.speed = 20;
+                     this.speed = 30*this.gauge_transfer;
                      break;
             case 2:  this.g = 6.5;
                      this.radius = 40;
-                     this.speed = 20;
+                     this.speed = 30*this.gauge_transfer;
             case 3:  this.g = 4.8;
                      this.radius = 100;
-                     this.speed = 20 ;
+                     this.speed = 30*this.gauge_transfer;
         }
         this.diameter = this.radius*2;
 

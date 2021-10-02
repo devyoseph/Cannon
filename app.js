@@ -23,6 +23,7 @@ let brick_touch = false;
 let on_gauge = false;
 let gauge_full = false;
 let gauge_percent = 0;
+let gauge_transfer = 0;
 class App{
     constructor(){
         this.canvas = document.createElement('canvas');
@@ -78,7 +79,7 @@ class App{
         //대포
         this.cannon.draw(this.ctx, this.stageWidth,this.stageHeight, ball_angle);
         //게이지
-        this.gauge.draw(this.ctx, gauge_percent, this.stageWidth, this.stageHeight);
+        this.gauge.draw(this.ctx, on_gauge,gauge_percent, this.stageWidth, this.stageHeight);
         if(on_gauge === true){
             this.gaugeMove();
         }
@@ -91,7 +92,7 @@ class App{
         })
         //공을 발사
         if(fire_ball === true){
-            var ball =  new Ball(ball_type, ball_magnitude,this.cannon.x, this.cannon.y, ball_angle);
+            var ball =  new Ball(ball_type, ball_magnitude, gauge_transfer,this.cannon.x, this.cannon.y, ball_angle);
             balls.push(ball);
             fire_ball = false;
         } 
@@ -129,6 +130,7 @@ class App{
         if(e.code === 'Space'){
             on_gauge = false;
             fire_ball = true;
+            gauge_transfer = gauge_percent*0.01;
             gauge_percent=0;
         }
     }
