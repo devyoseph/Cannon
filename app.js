@@ -2,6 +2,7 @@ import{Ball}from './element/ball.js';
 import { Brick } from './element/brick.js';
 import{Cannon}from './element/cannon.js';
 import{Stage}from './element/stage.js';
+import{Gauge}from './element/gauge.js';
 //각도 사용을 위한 PI 변수화
 const PI = Math.PI;
 //공 배열과 공 발사 변수
@@ -18,6 +19,10 @@ var bricks = [];
 //게임이 진행중인가, 벽이 부서졌는가
 let onGame =false;
 let brick_touch = false;
+//게이지
+let on_gauge = false;
+let gauge_full = false;
+let gauge_percent = 0;
 class App{
     constructor(){
         this.canvas = document.createElement('canvas');
@@ -50,10 +55,12 @@ class App{
         document.addEventListener('keydown', this.cannonMove.bind(this), false);
         document.addEventListener('keydown', this.cannonAiming.bind(this), false);
         //공 관련
-        document.addEventListener('keydown', this.fire.bind(this), false);
+        document.addEventListener('keydown', this.fire_before.bind(this), false);
+        document.addEventListener('keyup', this.fire_after.bind(this), false);
         window.requestAnimationFrame(this.animate.bind(this));
         document.addEventListener('keydown', this.shiftBallType.bind(this));
         document.addEventListener('keydown', this.shiftBallMagnitude.bind(this));
+        this.gauge = new Gauge(this.cannon, this.stageHeight);
     }
     
     resize(){
@@ -70,6 +77,11 @@ class App{
         this.ctx.clearRect(0,0,this.stageWidth,this.stageHeight);
         //대포
         this.cannon.draw(this.ctx, this.stageWidth,this.stageHeight, ball_angle);
+        //게이지
+        this.gauge.draw(this.ctx, gauge_percent, this.stageWidth, this.stageHeight);
+        if(on_gauge === true){
+            this.gaugeMove();
+        }
         //스테이지
         bricks.forEach((brick_each,i , o)=>{
             brick_each.draw(this.ctx, balls, brick_touch)
@@ -78,7 +90,7 @@ class App{
             }
         })
         //공을 발사
-        if(fire_ball == true){
+        if(fire_ball === true){
             var ball =  new Ball(ball_type, ball_magnitude,this.cannon.x, this.cannon.y, ball_angle);
             balls.push(ball);
             fire_ball = false;
@@ -108,9 +120,16 @@ class App{
         }
     }
 
-    fire(e){
+    fire_before(e){
         if(e.code === 'Space'){
+            on_gauge = true;
+        }
+    }
+    fire_after(e){
+        if(e.code === 'Space'){
+            on_gauge = false;
             fire_ball = true;
+            gauge_percent=0;
         }
     }
 
@@ -126,7 +145,6 @@ class App{
 
     shiftBallMagnitude(e){
         if(e.code === 'KeyZ'){
-        
             switch(ball_magnitude){
                 case 1: ball_magnitude++; break;
                 case 2: ball_magnitude++; break;
@@ -135,6 +153,21 @@ class App{
         }
     }
 
+    gaugeMove(){
+        if(gauge_percent == 100){
+            gauge_full = true;
+        }else if(gauge_percent == 0){
+            gauge_full = false;
+        }
+
+        let full = gauge_full;
+        if(!full){
+            gauge_percent++;
+        }
+        if(full){
+            gauge_percent--;
+        }
+    }
 
 
     }
