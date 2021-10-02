@@ -2,20 +2,13 @@ import{Ball}from './element/ball.js';
 import { Brick } from './element/brick.js';
 import{Cannon}from './element/cannon.js';
 import{Stage}from './element/stage.js';
-//import {Engine} from './element/engine.js';
 //각도 사용을 위한 PI 변수화
 const PI = Math.PI;
-//대포의 이미지 로드
-// let img_cannon = new Image();
-// img_cannon.src = 'image/cannon.png';
-//대포 출력
-var cannon_power = 600;
 //공 배열과 공 발사 변수
 var balls = [];
 var fire_ball = false;
 //공의 타입과 속도
 var ball_type = 1;
-var ball_speed = 50;
 var ball_angle = PI/4;
 var ball_magnitude = 1;
 //stage의 벽돌 배치 walls
@@ -59,7 +52,8 @@ class App{
         //공 관련
         document.addEventListener('keydown', this.fire.bind(this), false);
         window.requestAnimationFrame(this.animate.bind(this));
-        document.addEventListener('keydown', this.shiftBall.bind(this));
+        document.addEventListener('keydown', this.shiftBallType.bind(this));
+        document.addEventListener('keydown', this.shiftBallMagnitude.bind(this));
     }
     
     resize(){
@@ -85,13 +79,7 @@ class App{
         })
         //공을 발사
         if(fire_ball == true){
-            //if함수 내부에서 볼을 정의하고 보낸다, 외부에서 정의한 걸 불러오면 오류
-            switch(ball_type){
-                case 1: var ball =  new Ball(1, ball_magnitude, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed); break;
-                case 2: var ball =  new Ball(2, ball_magnitude, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed); break;
-                case 3: var ball =  new Ball(3, ball_magnitude, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed); break;
-            }
-            // var ball =  new Ball(1, this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight, ball_speed);
+            var ball =  new Ball(ball_type, ball_magnitude,this.cannon.x, this.cannon.y, ball_angle);
             balls.push(ball);
             fire_ball = false;
         } 
@@ -100,7 +88,6 @@ class App{
             if(ball_each.speed < 0.2 || ball_each.ball_meet == true){
                 o.splice(i,1);}
         })
-
     }
 
     cannonMove(e){
@@ -125,17 +112,25 @@ class App{
         if(e.code === 'Space'){
             fire_ball = true;
         }
-
     }
 
-    shiftBall(e){
-
-        if(e.key === 'Shift'){
-        
+    shiftBallType(e){
+        if(e.key === 'Shift'){      
             switch(ball_type){
                 case 1: ball_type++; break;
                 case 2: ball_type++; break;
                 case 3: ball_type = 1; break;
+            }
+        }
+    }
+
+    shiftBallMagnitude(e){
+        if(e.code === 'KeyZ'){
+        
+            switch(ball_magnitude){
+                case 1: ball_magnitude++; break;
+                case 2: ball_magnitude++; break;
+                case 3: ball_magnitude = 1; break;
             }
         }
     }

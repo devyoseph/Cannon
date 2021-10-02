@@ -1,42 +1,33 @@
 export class Ball{
-    constructor(type, magnitude,cannonX, cannonY, angle, stageWidth, stageHeight, speed){
+    constructor(type, magnitude,cannonX, cannonY, angle){
         //공의 타입에 따라 세기가 달라진다
         this.g = 9.81;
-        this.angle = angle;
-        this.type = type;
         this.magnitude = magnitude;
-        //다른 속성끼리 부딪힐 때 사용
-        this.ball_meet = false; 
-        if(this.magnitude == 1){
-            this.force = 300;
-            this.mass = 10;
-            this.radius = 10;
-        }
-        else if(this.magnitude == 2){
-            this.force = 300;
-            this.mass = 22.5;
-            this.radius = 15;
-        }
-        else if(this.magnitude == 3){
-            this.force = 300;
-            this.mass = 40;
-            this.radius = 20;
-        }
-        
-        this.diameter = this.radius*2;
+        this.angle = angle;
+        //brick과 부딪힐 때 사용
+        this.ball_meet = false;
 
-        //초기 가속도 생성하고 분해
-        if(this.angle > Math.PI/4 && this.angle <= Math.PI/2){
-            this.aX = this.force*Math.cos(this.angle)/this.mass;
-            this.aY = this.force*Math.sin(this.angle)/this.mass;}
-        if(this.angle <= Math.PI/4 && this.angle >= 0){
-            this.aX = this.force*Math.sin(this.angle)/this.mass;
-            this.aY = this.force*Math.cos(this.angle)/this.mass;}
-        
+        switch(type){
+            case 1: this.type = 1; console.log(this.type); break;
+            case 2: this.type = 2; console.log(this.type);break;
+            case 3: this.type = 3; console.log(this.type);break;
+        }
+        switch(this.magnitude){
+            case 1:  this.mass = 10;
+                     this.radius = 20;
+                     this.speed = 20;
+                     break;
+            case 2:  this.g = 6.5;
+                     this.radius = 40;
+                     this.speed = 20;
+            case 3:  this.g = 4.8;
+                     this.radius = 100;
+                     this.speed = 20 ;
+        }
+        this.diameter = this.radius*2;
 
         this.x = cannonX;     
         this.y = cannonY;    
-        this.speed = speed;
         this.vx = this.speed * Math.cos(angle);
         this.vy = -this.speed * Math.sin(angle);
 
