@@ -1,12 +1,17 @@
 export class Ball{
-    constructor(type, magnitude, gauge_transfer,cannonX, cannonY, angle){
+    constructor(type, magnitude, gauge_transfer,cannonX, cannonY, angle, stageWidth, stageHeight){
         //공의 타입에 따라 세기가 달라진다
         this.g = 9.81;
         this.magnitude = magnitude;
         this.gauge_transfer = gauge_transfer;
         this.angle = angle;
+        this.stageWidth =stageWidth;
+        this.stageHeight = stageHeight;
+        this.speed = this.stageWidth/60;
         //brick과 부딪힐 때 사용
         this.ball_meet = false;
+        this.cannonX = cannonX;
+        this.cannonY = cannonY;
 
         switch(type){
             case 1: this.type = 1; break;
@@ -15,19 +20,18 @@ export class Ball{
         }
         switch(this.magnitude){
             case 1:  this.mass = 10;
-                     this.radius = 20;
-                     this.speed = 30*this.gauge_transfer;
+                     this.radius = this.stageWidth/80;
                      break;
             case 2:  this.g = 6.5;
-                     this.radius = 40;
-                     this.speed = 30*this.gauge_transfer;
+                     this.radius = this.stageWidth/35;
+                     break;
             case 3:  this.g = 4.8;
-                     this.radius = 100;
-                     this.speed = 30*this.gauge_transfer;
+                     this.radius = this.stageWidth/15;
+                     break;
         }
         this.diameter = this.radius*2;
 
-        this.x = cannonX;     
+        this.x = cannonX+this.stageWidth/13;     
         this.y = cannonY;    
         this.vx = this.speed * Math.cos(angle);
         this.vy = -this.speed * Math.sin(angle);
@@ -35,7 +39,7 @@ export class Ball{
     }
     draw(ctx, stageWidth, stageHeight){
         //중력가속도
-        this.vy += this.g/40;
+        this.vy += this.g/160;
         this.x += this.vx;
         this.y += this.vy;
         //포탄을 배열에서 회수하기위한 스피드 변수 측정

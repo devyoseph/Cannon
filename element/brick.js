@@ -6,21 +6,28 @@ export class Brick{
             this.stageWidth = stageWidth;
             this.stageHeight = stageHeight;
             this.brick_width = stageWidth/24;
-            this.brick_height = stageHeight/60;
+            this.brick_height = stageHeight/20;
+            this.border= stageWidth/1600;
         }
         draw(ctx, balls, brick_touch){
             this.brickCollision(balls, brick_touch);
             if(this.type ==1){
-                ctx.fillStyle = 'red';
+                ctx.fillStyle = 'brown';
                 ctx.fillRect(this.x, this.y, this.brick_width, this.brick_height);
+                ctx.fillStyle = 'red';
+                ctx.fillRect(this.x+this.border, this.y+this.border, this.brick_width-this.border*2, this.brick_height-this.border*2);
             }
             if(this.type ==2){
-                ctx.fillStyle = 'blue';
+                ctx.fillStyle = 'rgba(40, 71, 109)';
                 ctx.fillRect(this.x, this.y, this.brick_width, this.brick_height);
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(this.x+this.border, this.y+this.border, this.brick_width-this.border*2, this.brick_height-this.border*2);
             }
             if(this.type ==3){
-                ctx.fillStyle = 'green';
+                ctx.fillStyle = 'rgba(66, 86, 34)';
                 ctx.fillRect(this.x, this.y, this.brick_width, this.brick_height);
+                ctx.fillStyle = 'green';
+                ctx.fillRect(this.x+this.border, this.y+this.border, this.brick_width-this.border*2, this.brick_height-this.border*2);
             }
         }
         //brick 타입: 1 = 불 / 2 = 물 / 3 = 식물
