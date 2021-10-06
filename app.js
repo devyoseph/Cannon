@@ -6,8 +6,12 @@ import{Gauge}from './element/gauge.js';
 import{Guideline}from './element/guideline.js';
 import{PresentBall}from './element/presentball.js';
 import { Teleport } from './element/teleport.js';
-//시작
-let start_hover = false;
+import { Mana } from './element/mana.js';
+import{Text} from './element/text.js';
+import{Gauging} from './element/gauging.js';
+//대기
+let wait_timer = 0;
+let wait_load = false;
 //각도 사용을 위한 PI 변수화
 const PI = Math.PI;
 //공 배열과 공 발사 변수
@@ -17,7 +21,7 @@ var fire_ball = false;
 var ball_type = 1;
 var ball_angle = PI/4;
 var ball_magnitude = 1;
-let on_Aim  = false;
+let on_aim  = false;
 let angle_timer = 0;
 let present_angle = 1;
 let last_angle = 1;
@@ -47,6 +51,9 @@ let on_teleport = false;
 let teleport_timer = 0;
 let teleports = [];
 let teleportX = 0;
+//마나
+let mana_now = 100;
+let mana_consumption =0;
 class App{
     constructor(){
         this.canvas = document.createElement('canvas');
@@ -62,15 +69,16 @@ class App{
         cannonFixY = this.cannon.y;
         cannonFlyHeight = this.stageHeight/150;
         document.addEventListener('keydown', this.cannonMove.bind(this), false);
-        document.addEventListener('keydown', this.cannonAiming.bind(this), false);
+        document.addEventListener('keydown', this.cannonAiming.bind(this), false);    
         //텔레포트
-        // this.teleport = new Teleport(this.cannon, this.stageWidth, this.stageHeight);
         document.addEventListener('keydown',this.teleportMove.bind(this), false);
         //공 관련
         document.addEventListener('keydown', this.fire_before.bind(this), false);
         document.addEventListener('keyup', this.fire_after.bind(this), false);
         document.addEventListener('keydown', this.shiftBallType.bind(this));
         document.addEventListener('keydown', this.shiftBallMagnitude.bind(this));
+        //게이지모으기
+        this.gauging = new Gauging(this.stageWidth, this.stageHeight);
         //가이드라인
         this.gauge = new Gauge(this.cannon, this.stageHeight);
         this.guideline = new Guideline(this.stageWidth, this.stageHeight);
@@ -78,6 +86,8 @@ class App{
         window.requestAnimationFrame(this.animate.bind(this));
         //정보창
         this.present_ball = new PresentBall(this.stageWidth, this.stageHeight);
+        this.mana = new Mana(this.stageWidth, this.stageHeight);
+        this.text = new Text(this.stageWidth, this.stageHeight);
     }
     
     resize(){
@@ -92,8 +102,9 @@ class App{
     animate(t){
         window.requestAnimationFrame(this.animate.bind(this));
         this.ctx.clearRect(0,0,this.stageWidth,this.stageHeight);
-
         if(stage_clear === true){
+                //시작화면 켜기
+                    wait_load = true;
                 //스테이지 로드
                 this.stage = new Stage(stage_level, this.stageWidth, this.stageHeight);
                 this.walls = this.stage.walls;
@@ -108,30 +119,38 @@ class App{
                     bricks.push(brick);
                     }
                 }
+            mana_now = 100;
             stage_clear = false;
         }
+            
         if(onGame == true){
-        // //대포
-        // this.cannon.draw(this.ctx, this.stageWidth,this.stageHeight, ball_angle);
         //상하운동
         if(on_gauge == false){
             cannon_angle += Math.PI/45;
             this.cannon.y = cannonFixY + cannonFlyHeight*Math.sin(cannon_angle) ;}
         //에임 가속도
-        if(on_Aim == true){
+        if(on_aim == true){
             angle_timer ++;
-            console.log(angle_timer);
-            on_Aim =false;
+            on_aim =false;
         }
         //정보창
         this.present_ball.draw(this.ctx, ball_type, ball_magnitude);
+
         //게이지
         this.gauge.draw(this.ctx, ball_type,this.cannon,on_gauge,gauge_percent, this.stageWidth, this.stageHeight);
         if(on_gauge === true){
             cannon_angle = 0;
             this.guideline.draw(this.ctx, ball_type,this.cannon, ball_angle, on_gauge);
+            this.manaConsumption(ball_magnitude);
             this.gaugeMove();
         }
+        
+        if(on_gauge ==true){
+            this.gauging.draw(this.ctx, this.cannon.x, this.cannon.y, ball_type, ball_magnitude);
+        }
+
+        //마나창을 일부러 게이지 뒤로 뺀다
+        this.mana.draw(this.ctx, mana_now, on_gauge, mana_consumption);
         //스테이지
         bricks.forEach((brick_each,i , o)=>{
             brick_each.draw(this.ctx, balls, brick_touch)
@@ -140,12 +159,11 @@ class App{
                 o.splice(i,1);
             }
         })
-        if(bricks.length == 0){
-            stage_clear = true;
-        }
         //공을 발사
         if(fire_ball === true){
             var ball =  new Ball(ball_type, ball_magnitude, gauge_transfer,this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight);
+            this.manaConsumption(ball_magnitude);
+            mana_now -= mana_consumption;
             balls.push(ball);
             fire_ball = false;
             angle_timer = 0;
@@ -158,7 +176,6 @@ class App{
         //텔레포트
         if(on_teleport == true){
             var teleport = new Teleport(this.stageWidth, this.stageHeight);
-            // this.teleport.draw(this.ctx, teleport_timer, this.cannon.x, this.cannon.y);
             teleports.push(teleport);
             on_teleport = false;
         }
@@ -167,8 +184,34 @@ class App{
             if(tele_each.teleport_timer >= 21){
                 o.splice(i,1);}
         })
-        //마법사: 맨 뒤에 배치해 공이 뒤로 그려지도록 했다
+        this.preventOut(this.cannon.x, this.cannon.cannon_width);
+
+
+        //마법사: 최대한 뒤에 배치해 공이 뒤로 그려지도록 했다
         this.cannon.draw(this.ctx, this.stageWidth,this.stageHeight, ball_angle);
+        
+        //시작 화면
+        if(wait_load == true){
+           wait_timer++;
+           this.text.draw(this.ctx, wait_timer,1,stage_level);
+           if(this.text.wait == false){
+               wait_load = false;
+               wait_timer = 0;
+              this.text.wait = true;
+          }
+        }
+        //클리어시 화면
+        if(bricks.length == 0){
+            wait_timer++;
+           this.text.draw(this.ctx, wait_timer,2);
+           if(this.text.wait == false){
+               stage_clear = true;
+               stage_level++;
+               balls = [];
+               wait_timer = 0;
+               this.text.wait = true; 
+          }
+        }   
      }
     }
     cannonFly(cannonY, timer_angle  ){
@@ -214,7 +257,7 @@ class App{
             last_angle = present_angle;
             present_angle = 1;
             if(last_angle*present_angle==1){
-                on_Aim =  true;}
+                on_aim =  true;}
             if(last_angle*present_angle==-1){
                 angle_timer = 0;}
             ball_angle += PI/180;
@@ -233,7 +276,7 @@ class App{
             last_angle = present_angle;
             present_angle = -1;
             if(last_angle*present_angle==1){
-            on_Aim =  true;}
+            on_aim =  true;}
             if(last_angle*present_angle==-1){
                 angle_timer = 0;}
             ball_angle -= PI/180;
@@ -300,6 +343,20 @@ class App{
         }
     }
 
+    manaConsumption(magnitude){
+        switch(magnitude){
+            case 1: mana_consumption=2; break;
+            case 2: mana_consumption=4;break;
+            case 3: mana_consumption=10;break;   }
+    }
+
+    preventOut(cannonX, cannonWidht){
+        if(cannonX<=0){
+            this.cannon.x = 0;}
+        if(cannonX +cannonWidht>=this.stageWidth){  
+            this.cannon.x = this.stageWidth-cannonWidht;
+        }
+    }
 
     }
 

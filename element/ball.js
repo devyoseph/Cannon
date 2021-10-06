@@ -31,6 +31,7 @@ export class Ball{
         }
         this.diameter = this.radius*2;
 
+        //gauging에도 연결해야함
         this.x = cannonX+this.stageWidth/13;     
         this.y = cannonY;    
         this.vx = this.speed * Math.cos(angle);
