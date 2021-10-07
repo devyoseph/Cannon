@@ -1,5 +1,8 @@
 export class Ball{
-    constructor(type, magnitude, gauge_transfer,cannonX, cannonY, angle, stageWidth, stageHeight){
+    constructor(onLeft, cannonWidth,type, magnitude, gauge_transfer,cannonX, cannonY, angle, stageWidth, stageHeight){
+        //좌우 판별
+        this.onLeft = onLeft;
+        this.cannonWidth = cannonWidth;
         //공의 타입에 따라 세기가 달라진다
         this.g = 9.81;
         this.magnitude = magnitude;
@@ -7,11 +10,21 @@ export class Ball{
         this.angle = angle;
         this.stageWidth =stageWidth;
         this.stageHeight = stageHeight;
-        this.speed = this.stageWidth/60;
         //brick과 부딪힐 때 사용
         this.ball_meet = false;
+        
+        if(onLeft == true){
         this.cannonX = cannonX;
         this.cannonY = cannonY;
+        this.x = this.cannonX;
+        this.y = this.cannonY;
+    }    
+        if(onLeft == false){
+        this.cannonX = cannonX;
+        this.cannonY = cannonY;
+        this.x = this.cannonX+this.stageWidth/13;
+        this.y = this.cannonY;    
+    }
 
         switch(type){
             case 1: this.type = 1; break;
@@ -30,15 +43,12 @@ export class Ball{
                      break;
         }
         this.diameter = this.radius*2;
-
-        //gauging에도 연결해야함
-        this.x = cannonX+this.stageWidth/13;     
-        this.y = cannonY;    
+        this.speed = (this.stageWidth/60)*this.gauge_transfer;
         this.vx = this.speed * Math.cos(angle);
         this.vy = -this.speed * Math.sin(angle);
 
     }
-    draw(ctx, stageWidth, stageHeight){
+    draw(ctx, stageWidth, stageHeight, onBoss){
         //중력가속도
         this.vy += this.g/160;
         this.x += this.vx;
@@ -52,6 +62,8 @@ export class Ball{
         ctx.fillStyle = 'green';    
         }else if(this.type == 3){
         ctx.fillStyle = 'red';
+        }else{
+        ctx.fillStyle = 'rgba(217,239,169,0.7)';
         }
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);

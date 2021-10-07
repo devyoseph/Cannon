@@ -8,9 +8,13 @@ export class Gauging{
         this.radius = 0;
     }
 
-    draw(ctx, cannonX, cannonY, ball_type, ball_magnitude){
+    draw(ctx, onLeft,cannonX, cannonY, ball_type, ball_magnitude){
         //ball과 값 맞추기
-         this.x = cannonX + this.stageWidht/13;
+         if(onLeft == false){
+         this.x = cannonX + this.stageWidht/13;}
+         if(onLeft == true){
+         this.x = cannonX;
+         }
          this.y = cannonY;
         //잔상 개수
          this.shadow = 10;
@@ -39,6 +43,7 @@ export class Gauging{
                 case 1: ctx.fillStyle = 'rgba(48,86,149,0.2)'; break;
                 case 2: ctx.fillStyle = 'rgba(69,135,77,0.2)'; break;
                 case 3: ctx.fillStyle = 'rgba(124,31,24,0.2)'; break;
+                case 4: ctx.fillStyle = 'rgba(255,255,255,0.1)'; break;
             }
             ctx.beginPath();
             ctx.arc(this.x+this.radius*Math.cos(this.angle+i*this.angle_move), this.y+this.radius*Math.sin(this.angle+i*this.angle_move), this.stageHeight/75, 0, Math.PI*2);
@@ -55,6 +60,7 @@ export class Gauging{
                 case 1: ctx.fillStyle = 'rgba(48,86,149,0.2)'; break;
                 case 2: ctx.fillStyle = 'rgba(69,135,77,0.2)'; break;
                 case 3: ctx.fillStyle = 'rgba(124,31,24,0.2)'; break;
+                case 4: ctx.fillStyle = 'rgba(255,255,255,0.1)'; break;
             }
             ctx.beginPath();
             ctx.arc(this.x+this.radius*Math.cos(this.angle+i*this.angle_move), this.y+this.radius*Math.sin(this.angle+i*this.angle_move), this.stageHeight/40, 0, Math.PI*2);

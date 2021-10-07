@@ -43,12 +43,12 @@ let gauge_transfer = 0;
 let cannon_angle = 0; 
 let cannonFixY = 0;
 let cannonFlyHeight = 0;
+let onLeft = false;
 //각도 방향유지를 위한 방향
 let past_move = 1;
 let present_move = 1;
 //텔레포트(x)
 let on_teleport = false;
-let teleport_timer = 0;
 let teleports = [];
 let teleportX = 0;
 //마나
@@ -140,13 +140,13 @@ class App{
         this.gauge.draw(this.ctx, ball_type,this.cannon,on_gauge,gauge_percent, this.stageWidth, this.stageHeight);
         if(on_gauge === true){
             cannon_angle = 0;
-            this.guideline.draw(this.ctx, ball_type,this.cannon, ball_angle, on_gauge);
+            this.guideline.draw(this.ctx, onLeft, ball_type,this.cannon, ball_angle, on_gauge);
             this.manaConsumption(ball_magnitude);
             this.gaugeMove();
         }
         
         if(on_gauge ==true){
-            this.gauging.draw(this.ctx, this.cannon.x, this.cannon.y, ball_type, ball_magnitude);
+            this.gauging.draw(this.ctx, onLeft,this.cannon.x, this.cannon.y, ball_type, ball_magnitude);
         }
 
         //마나창을 일부러 게이지 뒤로 뺀다
@@ -161,7 +161,7 @@ class App{
         })
         //공을 발사
         if(fire_ball === true){
-            var ball =  new Ball(ball_type, ball_magnitude, gauge_transfer,this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight);
+            var ball =  new Ball(onLeft, this.cannon.cannon_width,ball_type, ball_magnitude, gauge_transfer,this.cannon.x, this.cannon.y, ball_angle, this.stageWidth, this.stageHeight);
             this.manaConsumption(ball_magnitude);
             mana_now -= mana_consumption;
             balls.push(ball);
@@ -188,7 +188,7 @@ class App{
 
 
         //마법사: 최대한 뒤에 배치해 공이 뒤로 그려지도록 했다
-        this.cannon.draw(this.ctx, this.stageWidth,this.stageHeight, ball_angle);
+        this.cannon.draw(this.ctx, onLeft);
         
         //시작 화면
         if(wait_load == true){
@@ -239,12 +239,14 @@ class App{
     }
     angleTurn(e){
         if(e.code === 'ArrowLeft' && onGame ==true){
+            onLeft = true;
             past_move = present_move;
             present_move = -1;  
             if(past_move == 1 && present_move == -1){
             ball_angle = Math.PI - ball_angle;}
         }
         if(e.code === 'ArrowRight' && onGame ==true){
+            onLeft = false;
             past_move = present_move;
             present_move = 1;
             if(past_move == -1 && present_move == 1){
